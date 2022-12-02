@@ -1,15 +1,14 @@
 <?php
 /**
- * PLUGIN NAME: Motheo Reports (Graphs and/or Charts)
+ * PLUGIN NAME: Motheo Reports (Enrolment Graphs and/or Charts)
  * DESCRIPTION: Create graphs for overall project enrolments, and bayley score graphs
  * VERSION: 1.0
- * AUTHOR: Ame Nono Diphoko
+ * AUTHOR: Ame N. Diphoko
  */
 
 // Call the REDCap Connect file in the main "redcap" directory
 require_once "../redcap_connect.php";
 
-error_reporting(E_ALL);
 // OPTIONAL: Your custom PHP code goes here. You may use any constants/variables listed in redcap_info().
 
 // Limit this plugin only to project_id 17, Motheo.
@@ -35,7 +34,8 @@ $temp_data = [
     "positive" => []
 ];
 
-$result = REDCap::getData('array', null, [ 'eligibility_subid', $date_field_name, $site_field_name, $cohort_field_name ]);
+// Enrolment data
+$result = REDCap::getData('array', null, [ $date_field_name, $site_field_name, $cohort_field_name ]);
 
 // TODO: get sites array automatically from dictionary => data mapping.
 //$fields = array('eligibility_enrol_site',);
