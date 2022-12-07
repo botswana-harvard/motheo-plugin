@@ -78,11 +78,15 @@ $finemot_data = prepare_data($subid_fieldname, $child_age_fieldname, $child2_age
 $gross_score = 'gross_summary';
 $gross_data = prepare_data($subid_fieldname, $child_age_fieldname, $child2_age_fieldname, $gross_score);
 
+$briefp_score = 'brief_summary';
+$briefp_data = prepare_data($subid_fieldname, $child_age_fieldname, $child2_age_fieldname, $briefp_score);
+
 $cog_chart_id = "cog_" . preg_replace('![^\w]+!', '_', uniqid(rand(), true));
 $reclang_chart_id = "reclang_" . preg_replace('![^\w]+!', '_', uniqid(rand(), true));
 $explang_chart_id = "explang_" . preg_replace('![^\w]+!', '_', uniqid(rand(), true));
 $finemot_chart_id = "finemot_" . preg_replace('![^\w]+!', '_', uniqid(rand(), true));
 $gross_chart_id = "gross_" . preg_replace('![^\w]+!', '_', uniqid(rand(), true));
+$briefp_chart_id = "briefp_" . preg_replace('![^\w]+!', '_', uniqid(rand(), true));
 ?>
 
 <div class="container-fluid">
@@ -138,6 +142,16 @@ $gross_chart_id = "gross_" . preg_replace('![^\w]+!', '_', uniqid(rand(), true))
                 </div>
                 <div class="panel-body">
                     <div id="<?=$gross_chart_id?>" class="chart"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h8 style="text-transform:uppercase"><b>Brief-P Scale</b></h8>
+                </div>
+                <div class="panel-body">
+                    <div id="<?=$briefp_chart_id?>" class="chart"></div>
                 </div>
             </div>
         </div>
@@ -280,6 +294,34 @@ $gross_chart_id = "gross_" . preg_replace('![^\w]+!', '_', uniqid(rand(), true))
                 },
                 y: {
                     label: 'Gross motor summary score'
+                }
+            }
+        }
+        c3.generate(chartConfig);
+    });
+</script>
+<script type="text/javascript">
+    $(function() {
+        var briefp_chartId = "<?=$briefp_chart_id?>";
+        var chartConfig = {
+            bindto: d3.select("#" + briefp_chartId),
+            data: {
+                xs: {score: 'child_age'},
+                columns: [
+                    <?=json_encode(array_merge([ 'score' ], array_values($briefp_data["score"])))?>,
+                    <?=json_encode(array_merge([ 'child_age' ], array_values($briefp_data["child_age"])))?>,
+                ],
+                type: 'scatter'
+            },
+            axis: {
+                x: {
+                    label: 'Child Age (months)',
+                    tick: {
+                        fit: false
+                    }
+                },
+                y: {
+                    label: 'BRIEF-P summary score'
                 }
             }
         }
