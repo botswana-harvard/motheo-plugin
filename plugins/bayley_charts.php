@@ -154,7 +154,7 @@ $gross_chart_id = "gross_" . preg_replace('![^\w]+!', '_', uniqid(rand(), true))
             data: {
                 xs: {score: 'child_age'},
                 columns: [
-                    <?=json_encode(array_merge([ 'score' ], array_keys($cog_data["score"])))?>,
+                    <?=json_encode(array_merge([ 'score' ], array_values($cog_data["score"])))?>,
                     <?=json_encode(array_merge([ 'child_age' ], array_values($cog_data["child_age"])))?>,
                 ],
                 type: 'scatter'
@@ -182,7 +182,7 @@ $gross_chart_id = "gross_" . preg_replace('![^\w]+!', '_', uniqid(rand(), true))
             data: {
                 xs: {score: 'child_age'},
                 columns: [
-                    <?=json_encode(array_merge([ 'score' ], array_keys($reclang_data["score"])))?>,
+                    <?=json_encode(array_merge([ 'score' ], array_values($reclang_data["score"])))?>,
                     <?=json_encode(array_merge([ 'child_age' ], array_values($reclang_data["child_age"])))?>,
                 ],
                 type: 'scatter'
@@ -210,7 +210,7 @@ $gross_chart_id = "gross_" . preg_replace('![^\w]+!', '_', uniqid(rand(), true))
             data: {
                 xs: {score: 'child_age'},
                 columns: [
-                    <?=json_encode(array_merge([ 'score' ], array_keys($explang_data["score"])))?>,
+                    <?=json_encode(array_merge([ 'score' ], array_values($explang_data["score"])))?>,
                     <?=json_encode(array_merge([ 'child_age' ], array_values($explang_data["child_age"])))?>,
                 ],
                 type: 'scatter'
@@ -238,7 +238,7 @@ $gross_chart_id = "gross_" . preg_replace('![^\w]+!', '_', uniqid(rand(), true))
             data: {
                 xs: {score: 'child_age'},
                 columns: [
-                    <?=json_encode(array_merge([ 'score' ], array_keys($finemot_data["score"])))?>,
+                    <?=json_encode(array_merge([ 'score' ], array_values($finemot_data["score"])))?>,
                     <?=json_encode(array_merge([ 'child_age' ], array_values($finemot_data["child_age"])))?>,
                 ],
                 type: 'scatter'
@@ -266,7 +266,7 @@ $gross_chart_id = "gross_" . preg_replace('![^\w]+!', '_', uniqid(rand(), true))
             data: {
                 xs: {score: 'child_age'},
                 columns: [
-                    <?=json_encode(array_merge([ 'score' ], array_keys($gross_data["score"])))?>,
+                    <?=json_encode(array_merge([ 'score' ], array_values($gross_data["score"])))?>,
                     <?=json_encode(array_merge([ 'child_age' ], array_values($gross_data["child_age"])))?>,
                 ],
                 type: 'scatter'
