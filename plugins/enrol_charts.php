@@ -11,8 +11,9 @@ require_once "../redcap_connect.php";
 
 // OPTIONAL: Your custom PHP code goes here. You may use any constants/variables listed in redcap_info().
 
-// Limit this plugin only to project_id 17, Motheo.
-$projects = [ 17, ];
+// Limit this plugin only to Motheo project.
+$project_id = 17;
+$projects = [ $project_id, ];
 REDCap::allowProjects($projects);
 
 // OPTIONAL: Display the project header
@@ -35,6 +36,7 @@ $temp_data = [
 ];
 
 // Enrolment data
+$event_id = 42;
 $result = REDCap::getData('array', null, [ $date_field_name, $site_field_name, $cohort_field_name ]);
 
 // TODO: get sites array automatically from dictionary => data mapping.
@@ -63,7 +65,7 @@ foreach ($result as $record_id => $record) {
      */
 //    $date_raw = $record[$Proj->firstEventId][$date_field_name];
 
-    $date_raw = $record[42][$date_field_name];
+    $date_raw = $record[$event_id][$date_field_name];
     if (empty($date_raw)) continue;
 
     $date = (new \DateTime($date_raw))
@@ -74,7 +76,7 @@ foreach ($result as $record_id => $record) {
     }
     $temp_data["months"][$date]++;
     
-    $site_raw = $record[42][$site_field_name];
+    $site_raw = $record[$event_id][$site_field_name];
     if(empty($site_raw)) continue;
     $site = $sites_map[$site_raw];
 
@@ -83,7 +85,7 @@ foreach ($result as $record_id => $record) {
     }
     $temp_data[$site][$date]++;
 
-    $cohort_raw = $record[42][$cohort_field_name];
+    $cohort_raw = $record[$event_id][$cohort_field_name];
 
     if(!isset($cohort_raw)) continue;
     $cohort = $cohort_map[$cohort_raw];
