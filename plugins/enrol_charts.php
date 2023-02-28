@@ -68,16 +68,20 @@ foreach ($result as $record_id => $record) {
     $date_raw = $record[$event_id][$date_field_name];
     if (empty($date_raw)) continue;
 
-    $date = (new \DateTime($date_raw))
-        ->modify('first day of this month')
-        ->format('Y-m-d');
+    try {
+        $date = (new \DateTime($date_raw))
+            ->modify('first day of this month')
+            ->format('Y-m-d');
+    } catch (Exception $e) {
+        echo $e;
+    }
     if (!array_key_exists($date, $temp_data["months"])) {
         $temp_data["months"][$date] = 0;
     }
     $temp_data["months"][$date]++;
-    
+
     $site_raw = $record[$event_id][$site_field_name];
-    if(empty($site_raw)) continue;
+    if (empty($site_raw)) continue;
     $site = $sites_map[$site_raw];
 
     if (!array_key_exists($date, $temp_data[$site])) {
@@ -87,10 +91,10 @@ foreach ($result as $record_id => $record) {
 
     $cohort_raw = $record[$event_id][$cohort_field_name];
 
-    if(!isset($cohort_raw)) continue;
+    if (!isset($cohort_raw)) continue;
     $cohort = $cohort_map[$cohort_raw];
 
-    if(!array_key_exists($site, $temp_data[$cohort])) {
+    if (!array_key_exists($site, $temp_data[$cohort])) {
         $temp_data[$cohort][$site] = 0;
     }
     $temp_data[$cohort][$site]++;
@@ -125,20 +129,22 @@ $cohort_bar_id = "bar_" . preg_replace('![^\w]+!', '_', uniqid(rand(), true));
             <div class="col-12 col-md-6">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <p>Overall enrolment(s) over time using the <kbd><?=$date_field_name?></kbd> field to plot the </br> chart.</p>
+                        <p>Overall enrolment(s) over time using the <kbd><?= $date_field_name ?></kbd> field to plot
+                            the </br> chart.</p>
                     </div>
                     <div class="panel-body">
-                        <div id="<?=$enrol_chart_id?>" class="chart"></div>
+                        <div id="<?= $enrol_chart_id ?>" class="chart"></div>
                     </div>
                 </div>
             </div>
             <div class="col-12 col-md-6">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <p>Enrolment(s) by site using the <kbd><?=$date_field_name?></kbd> and <kbd><?=$site_field_name?></kbd> field.</p>
+                        <p>Enrolment(s) by site using the <kbd><?= $date_field_name ?></kbd> and
+                            <kbd><?= $site_field_name ?></kbd> field.</p>
                     </div>
                     <div class="panel-body col-md-12">
-                        <div id="<?=$sites_chart_id?>" class="chart"></div>
+                        <div id="<?= $sites_chart_id ?>" class="chart"></div>
                     </div>
                 </div>
             </div>
@@ -153,7 +159,7 @@ $cohort_bar_id = "bar_" . preg_replace('![^\w]+!', '_', uniqid(rand(), true));
                         <p>Enrolment(s) by site </p>
                     </div>
                     <div class="panel-body col-md-12">
-                        <div id="<?=$sites_pie_id?>" class="chart"></div>
+                        <div id="<?= $sites_pie_id ?>" class="chart"></div>
                     </div>
                 </div>
             </div>
@@ -163,26 +169,39 @@ $cohort_bar_id = "bar_" . preg_replace('![^\w]+!', '_', uniqid(rand(), true));
                         <p style="">Enrolment by cohort (per site)</p>
                     </div>
                     <div class="panel-body col-md-12">
-                        <div id="<?=$cohort_bar_id?>" class="chart"></div>
+                        <div id="<?= $cohort_bar_id ?>" class="chart"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div id="enrollmentChart" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
     <link rel="stylesheet prefetch" href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.6.9/c3.min.css">
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js" charset="utf-8"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js"
+            charset="utf-8"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.6.9/c3.min.js"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/series-label.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
     <script type="text/javascript">
-        $(function() {
+        $(function () {
             var chartId = "<?=$enrol_chart_id?>";
             var chartConfig = {
                 bindto: d3.select("#" + chartId),
                 data: {
                     x: 'x',
                     columns: [
-                        <?=json_encode(array_merge([ 'x' ], array_keys($temp_data["cumulative"])))?>,
-                        <?=json_encode(array_merge([ 'Number Recruited' ], array_values($temp_data["months"])))?>,
-                        <?=json_encode(array_merge([ 'Cumulative' ], array_values($temp_data["cumulative"])))?>,
+                        <?=json_encode(array_merge(['x'], array_keys($temp_data["cumulative"])))?>,
+                        <?=json_encode(array_merge(['Number Recruited'], array_values($temp_data["months"])))?>,
+                        <?=json_encode(array_merge(['Cumulative'], array_values($temp_data["cumulative"])))?>,
                     ],
                     types: {
                         "Number Recruited": "bar",
@@ -205,16 +224,16 @@ $cohort_bar_id = "bar_" . preg_replace('![^\w]+!', '_', uniqid(rand(), true));
         });
     </script>
     <script type="text/javascript">
-        $(function() {
+        $(function () {
             var site_chartId = "<?=$sites_chart_id?>";
             var chartConfig = {
                 bindto: d3.select("#" + site_chartId),
                 data: {
                     x: 'x',
                     columns: [
-                        <?=json_encode(array_merge([ 'x' ], array_values($site_months)))?>,
-                        <?=json_encode(array_merge([ 'Molepolole' ], array_values($temp_data["molepolole"])))?>,
-                        <?=json_encode(array_merge([ 'Gaborone' ], array_values($temp_data["gaborone"])))?>,
+                        <?=json_encode(array_merge(['x'], array_values($site_months)))?>,
+                        <?=json_encode(array_merge(['Molepolole'], array_values($temp_data["molepolole"])))?>,
+                        <?=json_encode(array_merge(['Gaborone'], array_values($temp_data["gaborone"])))?>,
                     ],
                 },
                 axis: {
@@ -233,61 +252,146 @@ $cohort_bar_id = "bar_" . preg_replace('![^\w]+!', '_', uniqid(rand(), true));
         });
     </script>
     <script type="text/javascript">
-        $(function() {
-          var site_pieId = "<?=$sites_pie_id?>";
-          var pieConfig = {
-            bindto: d3.select("#" + site_pieId),
-            data: {
-                  columns: [
-                    <?=json_encode(array_merge([ 'Molepolole' ], array_values($temp_data["molepolole"])))?>,
-                    <?=json_encode(array_merge([ 'Gaborone' ], array_values($temp_data["gaborone"])))?>,
-                  ],
-                  type : 'pie',
-                  onclick: function (d, i) { console.log("onclick", d, i); },
-                  onmouseover: function (d, i) { console.log("onmouseover", d, i); },
-                  onmouseout: function (d, i) { console.log("onmouseout", d, i); }
-            },
-            legend: {
-                show: true,
-                position: 'inset'
-            },
-            tooltip: {
-                format: {
-                  value: function (value, ratio, id, index) { return value +" ("+ round(ratio*100, 1) + "%)"; }
-                }
-            },
+        $(function () {
+            var site_pieId = "<?=$sites_pie_id?>";
+            var pieConfig = {
+                bindto: d3.select("#" + site_pieId),
+                data: {
+                    columns: [
+                        <?=json_encode(array_merge(['Molepolole'], array_values($temp_data["molepolole"])))?>,
+                        <?=json_encode(array_merge(['Gaborone'], array_values($temp_data["gaborone"])))?>,
+                    ],
+                    type: 'pie',
+                    onclick: function (d, i) {
+                        console.log("onclick", d, i);
+                    },
+                    onmouseover: function (d, i) {
+                        console.log("onmouseover", d, i);
+                    },
+                    onmouseout: function (d, i) {
+                        console.log("onmouseout", d, i);
+                    }
+                },
+                legend: {
+                    show: true,
+                    position: 'inset'
+                },
+                tooltip: {
+                    format: {
+                        value: function (value, ratio, id, index) {
+                            return value + " (" + round(ratio * 100, 1) + "%)";
+                        }
+                    }
+                },
 //            color: {
 //                pattern: ['#37A2EB', '#FF6383', ]
 //            }
-          }
-          c3.generate(pieConfig);
+            }
+            c3.generate(pieConfig);
         });
     </script>
     <script type="text/javascript">
-        $(function() {
-          var cohort_barId = "<?=$cohort_bar_id?>";
-          var barConfig = {
-          bindto: d3.select("#" + cohort_barId),
-          data: {
-                 columns: [
-                    <?=json_encode(array_merge([ 'Molepolole' ], array($temp_data["negative"]["molepolole"], $temp_data["positive"]["molepolole"])))?>,
-                    <?=json_encode(array_merge([ 'Gaborone' ], array($temp_data["negative"]["gaborone"], $temp_data["positive"]["gaborone"])))?>,
-                 ],
-                 type: 'bar'
-          },
-          bar: {
-             width: {
-                 ratio: 0.5
-             }
-          },
-          axis: {
-             x: {
-                 type: 'category',
-                 categories: <?=json_encode(array_map('ucfirst', array_values($cohort_map)))?>
-             }
-          }
+        $(function () {
+            var cohort_barId = "<?=$cohort_bar_id?>";
+            var barConfig = {
+                bindto: d3.select("#" + cohort_barId),
+                data: {
+                    columns: [
+                        <?=json_encode(array_merge(['Molepolole'], array($temp_data["negative"]["molepolole"], $temp_data["positive"]["molepolole"])))?>,
+                        <?=json_encode(array_merge(['Gaborone'], array($temp_data["negative"]["gaborone"], $temp_data["positive"]["gaborone"])))?>,
+                    ],
+                    type: 'bar'
+                },
+                bar: {
+                    width: {
+                        ratio: 0.5
+                    }
+                },
+                axis: {
+                    x: {
+                        type: 'category',
+                        categories: <?=json_encode(array_map('ucfirst', array_values($cohort_map)))?>
+                    }
+                }
+            }
+            c3.generate(barConfig);
+        });
+    </script>
+    <script type="text/javascript">
+        let data_records = <?=json_encode($result)?>;
+        let dates_data = [];
+        for (const key in data_records) {
+            dates_data.push(data_records[key]['<?=$event_id?>']['<?=$date_field_name?>'])
         }
-          c3.generate(barConfig);
+
+        function getWeek(date) {
+            const oneJan = new Date(date.getFullYear(), 0, 1);
+            return Math.ceil((((date - oneJan) / 86400000) + oneJan.getDay() + 1) / 7);
+        }
+
+        var frequency = [];
+        var dailyEnrolmentData = {};
+
+        // Loop through the array of dates
+        dates_data.forEach(function (date) {
+            // If the week already exists in the frequency table, increment the count
+            if (dailyEnrolmentData[date]) {
+                dailyEnrolmentData[date]++;
+            } else {
+                // If the week does not exist, create a new entry with a count of 1
+                dailyEnrolmentData[date] = 1;
+            }
+        });
+        for (const key in dailyEnrolmentData) {
+            if (key !== '') {
+                let temp = {
+                    date: key,
+                    enrollments: dailyEnrolmentData[key]
+                }
+                frequency.push(temp)
+            }
+        }
+        var currentWeekDates = [];
+        for (var i = 0; i < frequency.length; i++) {
+            var date = new Date(frequency[i].date);
+            let today =new Date()
+            if ((getWeek(date) === getWeek(today)) && date.getDay() > 0 && date.getDay() < 6 &&
+                date.getFullYear() === today.getFullYear()) {
+                currentWeekDates.push({
+                    date: frequency[i].date,
+                    enrollments: frequency[i].enrollments
+                });
+            }
+        }
+
+        // Create the chart
+        Highcharts.chart('enrollmentChart', {
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: 'Enrollment Activities of the Current Week'
+            },
+            xAxis: {
+                categories: [
+                    'Monday',
+                    'Tuesday',
+                    'Wednesday',
+                    'Thursday',
+                    'Friday'
+                ]
+            },
+            yAxis: {
+                title: {
+                    text: 'Enrollments'
+                }
+            },
+            series: [{
+                name: 'Enrollments',
+                data: currentWeekDates.map(function (d) {
+                    return d.enrollments;
+                })
+            }]
         });
     </script>
 <?php
